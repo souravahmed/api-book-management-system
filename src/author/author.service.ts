@@ -1,8 +1,10 @@
 import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Author } from './entities/author.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CreateAuthorDto } from './dto/create-author.dto';
+import { PaginatedResponse } from '@/common/interfaces/paginated-response.interface';
+import { GetAuthorDto } from './dto/get-author.dto';
 
 @Injectable()
 export class AuthorService {
@@ -49,5 +51,31 @@ export class AuthorService {
         },
       )
       .getOne();
+  }
+
+  async getAuthors(query: GetAuthorDto): Promise<PaginatedResponse<Author>> {
+    const { page = 1, limit = 10, search } = query;
+
+    const skip = (page - 1) * limit;
+    const where = search
+      ? [
+          { firstName: ILike(`%${search}%`) },
+          { lastName: ILike(`%${search}%`) },
+        ]
+      : {};
+
+    const [authors, total] = await this.authorRepository.findAndCount({
+      where,
+      skip,
+      take: limit,
+    });
+
+    return {
+      data: authors,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 }
