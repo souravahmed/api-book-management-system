@@ -111,4 +111,31 @@ describe('AuthorService', () => {
       authorService.getAuthorById('non-existing-id'),
     ).rejects.toThrow('Author with ID non-existing-id not found');
   });
+
+  it('SHOULD update author and return it', async () => {
+    const author = await authorService.create({ ...dummyAuthor });
+    const updatedAuthor = await authorService.updateAuthor(author.id, {
+      firstName: 'UpdatedFirstName',
+      birthDate: '2000-01-01',
+    });
+
+    expect(updatedAuthor).toBeDefined();
+    expect(updatedAuthor.id).toBe(author.id);
+    expect(updatedAuthor.firstName).toBe('UpdatedFirstName');
+    expect(updatedAuthor.lastName).toBe(author.lastName);
+    expect(updatedAuthor.bio).toBe(author.bio);
+    expect(updatedAuthor.birthDate).toBe('2000-01-01');
+  });
+
+  it('SHOULD throw error if author does not exist', async () => {
+    await authorService.create({
+      ...dummyAuthor,
+    });
+
+    await expect(
+      authorService.updateAuthor('non-existing-id', {
+        firstName: 'UpdatedFirstName',
+      }),
+    ).rejects.toThrow('Author with ID non-existing-id not found');
+  });
 });

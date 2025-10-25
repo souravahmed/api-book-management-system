@@ -10,6 +10,7 @@ import { ILike, Repository } from 'typeorm';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { PaginatedResponse } from '@/common/interfaces/paginated-response.interface';
 import { GetAuthorDto } from './dto/get-author.dto';
+import { UpdateAuthorDto } from './dto/update-author.dto';
 
 @Injectable()
 export class AuthorService {
@@ -43,16 +44,16 @@ export class AuthorService {
   }
 
   async getAuthorByFirstNameAndLastName(
-    firstName: string,
-    lastName: string,
+    firstName: string | undefined,
+    lastName: string | undefined,
   ): Promise<Author | null> {
     return await this.authorRepository
       .createQueryBuilder('author')
       .where(
         'LOWER(author.firstName) = LOWER(:firstName) AND LOWER(author.lastName) = LOWER(:lastName)',
         {
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
+          firstName: firstName?.trim(),
+          lastName: lastName?.trim(),
         },
       )
       .getOne();
@@ -94,5 +95,30 @@ export class AuthorService {
     }
 
     return author;
+  }
+
+  async updateAuthor(
+    id: string,
+    updateAuthorDto: UpdateAuthorDto,
+  ): Promise<Author> {
+    const author = await this.getAuthorById(id);
+
+    if (updateAuthorDto.firstName || updateAuthorDto.lastName) {
+      const existingAuthor = await this.getAuthorByFirstNameAndLastName(
+        updateAuthorDto.firstName,
+        updateAuthorDto.lastName,
+      );
+
+      if (existingAuthor && existingAuthor.id !== id) {
+        this.logger.warn(
+          `Author already exists: ${updateAuthorDto.firstName} ${updateAuthorDto.lastName}`,
+        );
+        throw new ConflictException('An author with this name already exists');
+      }
+    }
+
+    Object.assign(author, updateAuthorDto);
+
+    return this.authorRepository.save(author);
   }
 }
