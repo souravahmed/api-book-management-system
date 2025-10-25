@@ -29,6 +29,10 @@ describe('AuthorService', () => {
     await app.close();
   });
 
+  afterEach(async () => {
+    await authorRepository.clear();
+  });
+
   it('SHOULD create author and return it', async () => {
     const author = await authorService.create({ ...dummyAuthor });
 
@@ -38,20 +42,16 @@ describe('AuthorService', () => {
     expect(author.lastName).toBe('Doe');
     expect(author.bio).toBe('I am a test author');
     expect(author.birthDate).toBeDefined();
-
-    await authorRepository.delete({ id: author.id });
   });
 
   it('SHOULD throw error if author already exists', async () => {
-    const author = await authorService.create({
+    await authorService.create({
       ...dummyAuthor,
     });
 
     await expect(authorService.create({ ...dummyAuthor })).rejects.toThrow(
       'An author with this name already exists',
     );
-
-    await authorRepository.delete({ id: author.id });
   });
 
   it('SHOULD get authors with pagination', async () => {
@@ -78,8 +78,6 @@ describe('AuthorService', () => {
     expect(authors2.page).toBe(2);
     expect(authors2.limit).toBe(10);
     expect(authors2.totalPages).toBe(2);
-
-    await authorRepository.clear();
   });
 
   it('SHOULD get authors with search', async () => {
@@ -94,7 +92,23 @@ describe('AuthorService', () => {
     expect(authors.page).toBe(1);
     expect(authors.limit).toBe(10);
     expect(authors.totalPages).toBe(1);
+  });
 
-    await authorRepository.clear();
+  it('SHOULD get author by ID', async () => {
+    const author = await authorService.create({ ...dummyAuthor });
+    const foundAuthor = await authorService.getAuthorById(author.id);
+
+    expect(foundAuthor).toBeDefined();
+    expect(foundAuthor.id).toBe(author.id);
+    expect(foundAuthor.firstName).toBe(author.firstName);
+    expect(foundAuthor.lastName).toBe(author.lastName);
+    expect(foundAuthor.bio).toBe(author.bio);
+    expect(foundAuthor.birthDate).toBe(author.birthDate);
+  });
+
+  it('SHOULD throw error if author not found by ID', async () => {
+    await expect(
+      authorService.getAuthorById('non-existing-id'),
+    ).rejects.toThrow('Author with ID non-existing-id not found');
   });
 });

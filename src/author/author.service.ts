@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Author } from './entities/author.entity';
 import { ILike, Repository } from 'typeorm';
@@ -77,5 +82,17 @@ export class AuthorService {
       limit,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  async getAuthorById(id: string): Promise<Author> {
+    const author = await this.authorRepository.findOne({
+      where: { id },
+    });
+
+    if (!author) {
+      throw new NotFoundException(`Author with ID ${id} not found`);
+    }
+
+    return author;
   }
 }
