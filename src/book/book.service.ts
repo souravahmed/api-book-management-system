@@ -11,6 +11,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { AuthorService } from '@/author/author.service';
 import { PaginatedResponse } from '@/common/interfaces/paginated-response.interface';
 import { GetBookDto } from './dto/get-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 
 @Injectable()
 export class BookService {
@@ -46,11 +47,41 @@ export class BookService {
     }
   }
 
+  async updateBook(id: string, updateBookDto: UpdateBookDto): Promise<Book> {
+    try {
+      const book = await this.getBookById(id);
+
+      if (updateBookDto.isbn && updateBookDto.isbn !== book.isbn) {
+        await this.validateUniqueIsbn(updateBookDto.isbn);
+      }
+
+      Object.assign(book, updateBookDto);
+
+      return this.bookRepository.save(book);
+    } catch (error) {
+      this.logger.error(`Error while updating book with ID ${id}`, error);
+      throw error;
+    }
+  }
+
   async getBookByIsbn(isbn: string): Promise<Book> {
     const existingBook = await this.bookRepository.findOne({ where: { isbn } });
 
     if (!existingBook) {
       throw new NotFoundException(`Book with ISBN ${isbn} not found`);
+    }
+
+    return existingBook;
+  }
+
+  async getBookById(id: string): Promise<Book> {
+    const existingBook = await this.bookRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
+
+    if (!existingBook) {
+      throw new NotFoundException(`Book with ID ${id} not found`);
     }
 
     return existingBook;
@@ -84,6 +115,16 @@ export class BookService {
       limit,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  async deleteBook(id: string): Promise<void> {
+    try {
+      const book = await this.getBookById(id);
+      await this.bookRepository.remove(book);
+    } catch (error) {
+      this.logger.error('Error while deleting book', error);
+      throw error;
+    }
   }
 
   private buildBookSearchCondition(

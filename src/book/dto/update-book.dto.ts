@@ -1,17 +1,19 @@
 import { IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
 
-export class CreateBookDto {
+export class UpdateBookDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  title: string;
+  title?: string;
 
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @Matches(/^(97(8|9)[-\s]?)?\d{1,5}[-\s]?\d{1,7}[-\s]?\d{1,7}[-\s]?[\dX]$/, {
     message:
       'isbn must be a valid ISBN-10 or ISBN-13 format (e.g., 978-3-16-148410-0 or 0-306-40615-2)',
   })
-  isbn: string;
+  isbn?: string;
 
   @IsOptional()
   @IsString()
@@ -23,8 +25,4 @@ export class CreateBookDto {
   @IsOptional()
   @IsString()
   genre?: string;
-
-  @IsNotEmpty()
-  @IsString()
-  authorId: string;
 }
