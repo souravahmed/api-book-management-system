@@ -31,26 +31,6 @@ export class AuthorService {
     }
   }
 
-  async getAuthorByFirstNameAndLastName(
-    firstName: string | undefined,
-    lastName: string | undefined,
-  ): Promise<Author | null> {
-    if (!firstName && !lastName) {
-      return null;
-    }
-
-    return await this.authorRepository
-      .createQueryBuilder('author')
-      .where(
-        'LOWER(author.firstName) = LOWER(:firstName) AND LOWER(author.lastName) = LOWER(:lastName)',
-        {
-          firstName: firstName?.trim(),
-          lastName: lastName?.trim(),
-        },
-      )
-      .getOne();
-  }
-
   async getAuthors(query: GetAuthorDto): Promise<PaginatedResponse<Author>> {
     const { page = 1, limit = 10, search } = query;
 
