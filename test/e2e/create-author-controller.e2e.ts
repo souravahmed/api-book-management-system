@@ -16,11 +16,8 @@ describe('/authors (POST)', () => {
     authorRepository = app.get<Repository<Author>>(getRepositoryToken(Author));
   });
 
-  afterEach(async () => {
-    await authorRepository.clear();
-  });
-
   afterAll(async () => {
+    await authorRepository.clear();
     await app.close();
   });
 

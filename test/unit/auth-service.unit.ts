@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '@/app.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { dummyAuthor } from '@test/dummy-payload/author';
+import { dummyAuthor } from '@test/dummy/author.dummy';
 import { AuthorUtil } from '@test/util/author.util';
 import { AuthorService } from '@/author/author.service';
 import { Author } from '@/author/entities/author.entity';
