@@ -47,6 +47,10 @@ export class AuthorService {
     firstName: string | undefined,
     lastName: string | undefined,
   ): Promise<Author | null> {
+    if (!firstName && !lastName) {
+      return null;
+    }
+
     return await this.authorRepository
       .createQueryBuilder('author')
       .where(

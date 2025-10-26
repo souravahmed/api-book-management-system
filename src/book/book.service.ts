@@ -6,9 +6,11 @@ import {
 } from '@nestjs/common';
 import { Book } from './entities/book.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { CreateBookDto } from './dto/create-book.dto';
 import { AuthorService } from '@/author/author.service';
+import { PaginatedResponse } from '@/common/interfaces/paginated-response.interface';
+import { GetBookDto } from './dto/get-book.dto';
 
 @Injectable()
 export class BookService {
@@ -60,5 +62,47 @@ export class BookService {
     if (existingBook) {
       throw new ConflictException(`Book with ISBN ${isbn} already exists`);
     }
+  }
+
+  async getBooks(query: GetBookDto): Promise<PaginatedResponse<Book>> {
+    const { page = 1, limit = 10, search, authorId } = query;
+
+    const skip = (page - 1) * limit;
+    const where = this.buildBookSearchCondition(search, authorId);
+
+    const [books, total] = await this.bookRepository.findAndCount({
+      where,
+      relations: ['author'],
+      skip,
+      take: limit,
+    });
+
+    return {
+      data: books,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  private buildBookSearchCondition(
+    search?: string,
+    authorId?: string,
+  ): FindOptionsWhere<Book> | FindOptionsWhere<Book>[] {
+    const searchConditions = search
+      ? [{ title: ILike(`%${search}%`) }, { isbn: ILike(`%${search}%`) }]
+      : [];
+
+    if (authorId) {
+      return searchConditions.length
+        ? searchConditions.map((cond) => ({
+            ...cond,
+            author: { id: authorId },
+          }))
+        : { author: { id: authorId } };
+    }
+
+    return searchConditions.length ? searchConditions : {};
   }
 }
