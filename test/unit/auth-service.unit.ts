@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthorService } from './author.service';
 import { AppModule } from '@/app.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Author } from './entities/author.entity';
 import { Repository } from 'typeorm';
 import { dummyAuthor } from '@test/dummy-payload/author';
-import { AuthorUtil } from '@test/util/author-util';
+import { AuthorUtil } from '@test/util/author.util';
+import { AuthorService } from '@/author/author.service';
+import { Author } from '@/author/entities/author.entity';
 
 describe('AuthorService', () => {
   let authorService: AuthorService;

@@ -2,11 +2,53 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Run:Tests:All",
       "type": "node",
-      "name": "Jest Debug",
       "request": "launch",
       "runtimeExecutable": "npm",
-      "args": ["run", "test:debug", "--", "${relativeFile}"],
+      "runtimeArgs": [
+        "run",
+        "jest",
+        "--detectOpenHandles",
+        "--forceExit",
+        "--coverage",
+        "false"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Run:Tests:Selected",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "jest",
+        "--coverage",
+        "false",
+        "--detectOpenHandles",
+        "--forceExit",
+        "-t",
+        "${selectedText}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Run:Tests:CurrentFile",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "jest",
+        "--coverage",
+        "false",
+        "--detectOpenHandles",
+        "--forceExit",
+        "${relativeFile}"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     }
