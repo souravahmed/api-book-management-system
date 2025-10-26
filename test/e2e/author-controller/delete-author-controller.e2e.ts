@@ -7,6 +7,7 @@ import request from 'supertest';
 import { AuthorUtil } from '@test/util/author.util';
 import { AuthorService } from '@/author/author.service';
 import { Book } from '@/book/entities/book.entity';
+import { dummyBook } from '@test/dummy/book.dummy';
 
 describe('/authors/:id (DELETE)', () => {
   let app: INestApplication;
@@ -59,11 +60,9 @@ describe('/authors/:id (DELETE)', () => {
 
     it('SHOULD return 409 if author has books', async () => {
       const [authorToDelete] = await authorUtil.createAuthors(1);
+
       await bookRepository.save({
-        title: 'Test Book',
-        isbn: '123-4567890124',
-        summary: 'A book for testing',
-        publicationDate: '2023-01-01',
+        ...dummyBook,
         author: { id: authorToDelete.id },
       });
 
