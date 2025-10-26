@@ -21,7 +21,7 @@ export class AuthorService {
     private readonly authorRepository: Repository<Author>,
   ) {}
 
-  async create(createAuthorDto: CreateAuthorDto): Promise<Author> {
+  async createAuthor(createAuthorDto: CreateAuthorDto): Promise<Author> {
     try {
       const { firstName, lastName } = createAuthorDto;
 

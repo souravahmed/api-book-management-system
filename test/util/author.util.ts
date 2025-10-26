@@ -7,8 +7,8 @@ export class AuthorUtil {
   async createAuthors(count: number): Promise<Author[]> {
     const authors: Author[] = [];
 
-    for (let i = 0; i < count; i++) {
-      const author = await this.authorService.create({
+    for (let i = 1; i <= count; i++) {
+      const author = await this.authorService.createAuthor({
         firstName: `Author${i}`,
         lastName: `Test${i}`,
         bio: `Bio of Author${i}`,

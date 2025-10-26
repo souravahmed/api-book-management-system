@@ -2,8 +2,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Author } from '@/author/entities/author.entity';
 import request from 'supertest';
-import { INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import { TestAppManagerUtil } from '@test/util/test-app-manager.util';
+import { dummyAuthor } from '@test/dummy/author.dummy';
 
 describe('/authors (POST)', () => {
   let app: INestApplication;
@@ -61,21 +62,28 @@ describe('/authors (POST)', () => {
 
   describe('VALID Payload', () => {
     it('SHOULD create a new author and return 201', async () => {
-      const authorPayload = {
-        firstName: 'Sourav',
-        lastName: 'Ahmed',
-        bio: 'a passionate software engineer',
-        birthDate: '1999-12-16',
-      };
       const response = await request(app.getHttpServer())
         .post(apiEndPoint)
-        .send(authorPayload);
+        .send(dummyAuthor);
 
       expect(response.status).toBe(201);
-      expect(response.body.firstName).toBe(authorPayload.firstName);
-      expect(response.body.lastName).toBe(authorPayload.lastName);
-      expect(response.body.bio).toBe(authorPayload.bio);
-      expect(response.body.birthDate).toBe(authorPayload.birthDate);
+      expect(response.body.firstName).toBe(dummyAuthor.firstName);
+      expect(response.body.lastName).toBe(dummyAuthor.lastName);
+      expect(response.body.bio).toBe(dummyAuthor.bio);
+      expect(response.body.birthDate).toBe(dummyAuthor.birthDate);
+    });
+
+    it('SHOULD return 409 if author already exists', async () => {
+      const response = await request(app.getHttpServer())
+        .post(apiEndPoint)
+        .send(dummyAuthor)
+        .expect(HttpStatus.CONFLICT);
+
+      expect(response.body.message).toContain(
+        'An author with this name already exists',
+      );
+
+      expect(response.body.error).toBe(HttpStatus[HttpStatus.CONFLICT]);
     });
   });
 });

@@ -1,9 +1,18 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { AuthorService } from './author.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { Author } from './entities/author.entity';
 import { PaginatedResponse } from '@/common/interfaces/paginated-response.interface';
 import { GetAuthorDto } from './dto/get-author.dto';
+import { UpdateAuthorDto } from './dto/update-author.dto';
 
 @Controller('authors')
 export class AuthorController {
@@ -13,7 +22,7 @@ export class AuthorController {
   async createAuthor(
     @Body() createAuthorDto: CreateAuthorDto,
   ): Promise<Author> {
-    return await this.authorService.create(createAuthorDto);
+    return await this.authorService.createAuthor(createAuthorDto);
   }
 
   @Get()
@@ -26,5 +35,13 @@ export class AuthorController {
   @Get(':id')
   async getAuthor(@Param('id') id: string): Promise<Author> {
     return await this.authorService.getAuthorById(id);
+  }
+
+  @Patch(':id')
+  async updateAuthor(
+    @Param('id') id: string,
+    @Body() updateAuthorDto: UpdateAuthorDto,
+  ): Promise<Author> {
+    return await this.authorService.updateAuthor(id, updateAuthorDto);
   }
 }

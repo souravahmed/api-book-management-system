@@ -1,4 +1,5 @@
 import { AppModule } from '@/app.module';
+import { HttpExceptionFilter } from '@/common/exceptions/HttpExceptionFIlter';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { TestingModule, Test } from '@nestjs/testing';
 
@@ -14,6 +15,7 @@ export class TestAppManagerUtil {
 
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
     app.setGlobalPrefix('api');
+    app.useGlobalFilters(new HttpExceptionFilter());
 
     await app.init();
 

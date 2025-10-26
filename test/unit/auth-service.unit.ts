@@ -34,7 +34,7 @@ describe('AuthorService', () => {
   });
 
   it('SHOULD create author and return it', async () => {
-    const author = await authorService.create({ ...dummyAuthor });
+    const author = await authorService.createAuthor({ ...dummyAuthor });
 
     expect(author).toBeDefined();
     expect(author.id).toBeDefined();
@@ -45,13 +45,13 @@ describe('AuthorService', () => {
   });
 
   it('SHOULD throw error if author already exists', async () => {
-    await authorService.create({
+    await authorService.createAuthor({
       ...dummyAuthor,
     });
 
-    await expect(authorService.create({ ...dummyAuthor })).rejects.toThrow(
-      'An author with this name already exists',
-    );
+    await expect(
+      authorService.createAuthor({ ...dummyAuthor }),
+    ).rejects.toThrow('An author with this name already exists');
   });
 
   it('SHOULD get authors with pagination', async () => {
@@ -95,7 +95,7 @@ describe('AuthorService', () => {
   });
 
   it('SHOULD get author by ID', async () => {
-    const author = await authorService.create({ ...dummyAuthor });
+    const author = await authorService.createAuthor({ ...dummyAuthor });
     const foundAuthor = await authorService.getAuthorById(author.id);
 
     expect(foundAuthor).toBeDefined();
@@ -113,7 +113,7 @@ describe('AuthorService', () => {
   });
 
   it('SHOULD update author and return it', async () => {
-    const author = await authorService.create({ ...dummyAuthor });
+    const author = await authorService.createAuthor({ ...dummyAuthor });
     const updatedAuthor = await authorService.updateAuthor(author.id, {
       firstName: 'UpdatedFirstName',
       birthDate: '2000-01-01',
@@ -128,7 +128,7 @@ describe('AuthorService', () => {
   });
 
   it('SHOULD throw error if author does not exist', async () => {
-    await authorService.create({
+    await authorService.createAuthor({
       ...dummyAuthor,
     });
 
