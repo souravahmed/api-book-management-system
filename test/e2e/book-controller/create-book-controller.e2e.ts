@@ -65,7 +65,7 @@ describe('/books (POST)', () => {
         .expect(400);
 
       expect(response.body.message).toContain(
-        'publishedDate must be in YYYY-MM-DD format',
+        'publishedDate must be a valid ISO 8601 date string',
       );
     });
 
@@ -78,9 +78,7 @@ describe('/books (POST)', () => {
         } as CreateBookDto)
         .expect(400);
 
-      expect(response.body.message).toContain(
-        'isbn must be a valid ISBN-10 or ISBN-13 format',
-      );
+      expect(response.body.message).toContain('isbn must be an ISBN');
     });
   });
 

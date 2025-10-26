@@ -47,16 +47,6 @@ describe('AuthorService', () => {
     expect(author.birthDate).toBeDefined();
   });
 
-  it('SHOULD throw error if author already exists', async () => {
-    await authorService.createAuthor({
-      ...dummyAuthor,
-    });
-
-    await expect(
-      authorService.createAuthor({ ...dummyAuthor }),
-    ).rejects.toThrow('An author with this name already exists');
-  });
-
   it('SHOULD get authors with pagination', async () => {
     await authorUtil.createAuthors(15);
 

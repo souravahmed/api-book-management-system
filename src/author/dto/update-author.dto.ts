@@ -1,10 +1,4 @@
-import {
-  IsOptional,
-  IsString,
-  MaxLength,
-  IsDateString,
-  Matches,
-} from 'class-validator';
+import { IsOptional, IsString, MaxLength, IsDateString } from 'class-validator';
 
 export class UpdateAuthorDto {
   @IsOptional()
@@ -23,8 +17,5 @@ export class UpdateAuthorDto {
 
   @IsOptional()
   @IsDateString()
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: 'birthDate must be in YYYY-MM-DD format',
-  })
   birthDate?: string;
 }

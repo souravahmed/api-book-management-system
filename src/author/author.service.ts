@@ -23,18 +23,6 @@ export class AuthorService {
 
   async createAuthor(createAuthorDto: CreateAuthorDto): Promise<Author> {
     try {
-      const { firstName, lastName } = createAuthorDto;
-
-      const existingAuthor = await this.getAuthorByFirstNameAndLastName(
-        firstName,
-        lastName,
-      );
-
-      if (existingAuthor) {
-        this.logger.warn(`Author already exists: ${firstName} ${lastName}`);
-        throw new ConflictException('An author with this name already exists');
-      }
-
       const author = this.authorRepository.create(createAuthorDto);
       return await this.authorRepository.save(author);
     } catch (error) {
@@ -108,22 +96,6 @@ export class AuthorService {
   ): Promise<Author> {
     try {
       const author = await this.getAuthorById(id);
-
-      if (updateAuthorDto.firstName || updateAuthorDto.lastName) {
-        const existingAuthor = await this.getAuthorByFirstNameAndLastName(
-          updateAuthorDto.firstName,
-          updateAuthorDto.lastName,
-        );
-
-        if (existingAuthor && existingAuthor.id !== id) {
-          this.logger.warn(
-            `Author already exists: ${updateAuthorDto.firstName} ${updateAuthorDto.lastName}`,
-          );
-          throw new ConflictException(
-            'An author with this name already exists',
-          );
-        }
-      }
 
       Object.assign(author, updateAuthorDto);
 

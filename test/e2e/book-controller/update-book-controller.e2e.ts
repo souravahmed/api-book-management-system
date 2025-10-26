@@ -51,9 +51,7 @@ describe('/books (PATCH)', () => {
         } as UpdateBookDto)
         .expect(400);
 
-      expect(response.body.message).toContain(
-        'isbn must be a valid ISBN-10 or ISBN-13 format',
-      );
+      expect(response.body.message).toContain('isbn must be an ISBN');
     });
   });
 
@@ -70,7 +68,7 @@ describe('/books (PATCH)', () => {
       });
       secondBook = await bookRepository.save({
         ...dummyBook,
-        isbn: '0-306-40615-5',
+        isbn: '1-56619-909-3',
         author: { id: createdAuthor.id },
       });
     });
@@ -106,7 +104,7 @@ describe('/books (PATCH)', () => {
       );
     });
 
-    it('SHOULD return 409 if author already exists', async () => {
+    it('SHOULD return 409 if book already exists', async () => {
       const response = await request(app.getHttpServer())
         .patch(getApiEndPoint(firstBook.id))
         .send({

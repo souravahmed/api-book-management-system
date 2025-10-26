@@ -1,11 +1,19 @@
-import { IsString, IsOptional, MaxLength, Matches } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  MaxLength,
+  IsNotEmpty,
+  IsDateString,
+} from 'class-validator';
 
 export class CreateAuthorDto {
   @IsString()
+  @IsNotEmpty()
   @MaxLength(50)
   firstName: string;
 
   @IsString()
+  @IsNotEmpty()
   @MaxLength(50)
   lastName: string;
 
@@ -14,8 +22,6 @@ export class CreateAuthorDto {
   bio?: string;
 
   @IsOptional()
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: 'birthDate must be in YYYY-MM-DD format',
-  })
+  @IsDateString()
   birthDate?: string;
 }

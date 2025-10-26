@@ -44,8 +44,8 @@ describe('/authors (PATCH)', () => {
         })
         .expect(HttpStatus.BAD_REQUEST);
 
-      expect(response.body.message).toContain(
-        'birthDate must be in YYYY-MM-DD format',
+      expect(response.body.message).toBe(
+        'birthDate must be a valid ISO 8601 date string',
       );
     });
   });
@@ -89,22 +89,6 @@ describe('/authors (PATCH)', () => {
       expect(response.body.message).toContain(
         `Author with ID non-existing-id not found`,
       );
-    });
-
-    it('SHOULD return 409 if author already exists', async () => {
-      const response = await request(app.getHttpServer())
-        .patch(getApiEndPoint(createdAuthor.id))
-        .send({
-          firstName: 'author2',
-          lastName: 'test2',
-        })
-        .expect(HttpStatus.CONFLICT);
-
-      expect(response.body.message).toContain(
-        'An author with this name already exists',
-      );
-
-      expect(response.body.error).toBe(HttpStatus[HttpStatus.CONFLICT]);
     });
   });
 });
