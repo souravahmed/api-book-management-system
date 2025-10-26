@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -43,5 +44,10 @@ export class AuthorController {
     @Body() updateAuthorDto: UpdateAuthorDto,
   ): Promise<Author> {
     return await this.authorService.updateAuthor(id, updateAuthorDto);
+  }
+
+  @Delete(':id')
+  async deleteAuthor(@Param('id') id: string): Promise<void> {
+    return await this.authorService.deleteAuthor(id);
   }
 }

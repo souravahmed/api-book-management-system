@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthorModule } from './author/author.module';
 import { CommonModule } from './common/common.module';
 import { Author } from './author/entities/author.entity';
+import { BookModule } from './book/book.module';
+import { Book } from './book/entities/book.entity';
 
 @Module({
   imports: [
@@ -13,11 +15,12 @@ import { Author } from './author/entities/author.entity';
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'book-management.sqlite',
-      entities: [Author],
+      entities: [Author, Book],
       synchronize: true,
     }),
     AuthorModule,
     CommonModule,
+    BookModule,
   ],
   controllers: [],
   providers: [],

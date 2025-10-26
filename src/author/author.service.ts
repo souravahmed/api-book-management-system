@@ -88,6 +88,7 @@ export class AuthorService {
   async getAuthorById(id: string): Promise<Author> {
     const author = await this.authorRepository.findOne({
       where: { id },
+      relations: ['books'],
     });
 
     if (!author) {
@@ -101,24 +102,48 @@ export class AuthorService {
     id: string,
     updateAuthorDto: UpdateAuthorDto,
   ): Promise<Author> {
-    const author = await this.getAuthorById(id);
+    try {
+      const author = await this.getAuthorById(id);
 
-    if (updateAuthorDto.firstName || updateAuthorDto.lastName) {
-      const existingAuthor = await this.getAuthorByFirstNameAndLastName(
-        updateAuthorDto.firstName,
-        updateAuthorDto.lastName,
-      );
-
-      if (existingAuthor && existingAuthor.id !== id) {
-        this.logger.warn(
-          `Author already exists: ${updateAuthorDto.firstName} ${updateAuthorDto.lastName}`,
+      if (updateAuthorDto.firstName || updateAuthorDto.lastName) {
+        const existingAuthor = await this.getAuthorByFirstNameAndLastName(
+          updateAuthorDto.firstName,
+          updateAuthorDto.lastName,
         );
-        throw new ConflictException('An author with this name already exists');
+
+        if (existingAuthor && existingAuthor.id !== id) {
+          this.logger.warn(
+            `Author already exists: ${updateAuthorDto.firstName} ${updateAuthorDto.lastName}`,
+          );
+          throw new ConflictException(
+            'An author with this name already exists',
+          );
+        }
       }
+
+      Object.assign(author, updateAuthorDto);
+
+      return this.authorRepository.save(author);
+    } catch (error) {
+      this.logger.error('Error while updating author', error);
+      throw error;
     }
+  }
 
-    Object.assign(author, updateAuthorDto);
+  async deleteAuthor(id: string): Promise<void> {
+    try {
+      const author = await this.getAuthorById(id);
 
-    return this.authorRepository.save(author);
+      if (author.books && author.books.length > 0) {
+        throw new ConflictException(
+          'Cannot delete author with associated books',
+        );
+      }
+
+      await this.authorRepository.remove(author);
+    } catch (error) {
+      this.logger.error('Error while deleting author', error);
+      throw error;
+    }
   }
 }

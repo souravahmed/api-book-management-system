@@ -1,7 +1,8 @@
+import { Book } from '@/book/entities/book.entity';
 import { BaseEntity } from '@/common/entities/base.entity';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 
-@Entity()
+@Entity('authors')
 export class Author extends BaseEntity {
   @Column({ type: 'varchar', length: 50 })
   firstName: string;
@@ -14,4 +15,7 @@ export class Author extends BaseEntity {
 
   @Column({ type: 'date', nullable: true })
   birthDate?: Date;
+
+  @OneToMany(() => Book, (book) => book.author)
+  books: Book[];
 }

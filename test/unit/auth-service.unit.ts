@@ -6,30 +6,33 @@ import { dummyAuthor } from '@test/dummy/author.dummy';
 import { AuthorUtil } from '@test/util/author.util';
 import { AuthorService } from '@/author/author.service';
 import { Author } from '@/author/entities/author.entity';
+import { Book } from '@/book/entities/book.entity';
 
 describe('AuthorService', () => {
   let authorService: AuthorService;
   let app: TestingModule;
   let authorRepository: Repository<Author>;
+  let bookRepository: Repository<Book>;
   let authorUtil: AuthorUtil;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     app = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     authorService = app.get<AuthorService>(AuthorService);
     authorRepository = app.get<Repository<Author>>(getRepositoryToken(Author));
+    bookRepository = app.get<Repository<Book>>(getRepositoryToken(Book));
 
     authorUtil = new AuthorUtil(authorService);
   });
 
   afterAll(async () => {
-    await authorRepository.clear();
     await app.close();
   });
 
   afterEach(async () => {
+    await bookRepository.clear();
     await authorRepository.clear();
   });
 
@@ -137,5 +140,30 @@ describe('AuthorService', () => {
         firstName: 'UpdatedFirstName',
       }),
     ).rejects.toThrow('Author with ID non-existing-id not found');
+  });
+
+  it('SHOULD delete author', async () => {
+    const author = await authorService.createAuthor({ ...dummyAuthor });
+
+    await authorService.deleteAuthor(author.id);
+
+    await expect(authorService.getAuthorById(author.id)).rejects.toThrow(
+      `Author with ID ${author.id} not found`,
+    );
+  });
+
+  it('SHOULD throw error if author has books', async () => {
+    const author = await authorService.createAuthor({ ...dummyAuthor });
+    await bookRepository.save({
+      title: 'Test Book',
+      isbn: '123-4567890123',
+      summary: 'A book for testing',
+      publicationDate: '2023-01-01',
+      author: { id: author.id },
+    });
+
+    await expect(authorService.deleteAuthor(author.id)).rejects.toThrow(
+      'Cannot delete author with associated books',
+    );
   });
 });
